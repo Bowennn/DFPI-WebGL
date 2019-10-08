@@ -24,7 +24,7 @@ window.addEventListener('mousemove', function(e){
   percentX = percentX * 2 - 1 //-1~1
   percentY = percentY * 2 - 1 //-1~1
 
-  var moveRange = 50
+  var moveRange = 100
   mouseX = -percentX * moveRange
   mouseY = percentY * moveRange
 
@@ -98,6 +98,11 @@ void main(){
   //creat holder for position
   vec3 pos = position + uTranslate;
 
+  float scale = 0.4;
+  float z = sin(uTranslate.x * scale + uTranslate.y * scale + uTime * 5.0);
+  pos.z += z * 1.5;
+
+
   gl_Position= uProjectionMatrix * uViewMatrix * vec4(pos, 1.0);
   vColor = aColor;
   vUV = aUV;
@@ -124,8 +129,11 @@ void main(){
   //gradient: 0 ~ 1
 
   vec4 color = mix(colorDot, colorBg, gradient);
-  gl_FragColor = vec4(color);
-  //gl_FragColor = vec4((uTranslate/5.0) * .5 + .5, 1.0 - gradient);
+  //gl_FragColor = vec4(color);
+
+  float alpha = 1.0 - gradient;
+  alpha *= 0.2;
+  gl_FragColor = vec4((uTranslate/5.0) * .5 + .5, alpha);
 }
 `
 
@@ -170,22 +178,23 @@ function render () {
   // var cameraX = Math.sin(currTime) * cameraRadius
   // var  cameraZ = Math.cos(currTime) * cameraRadius
 
-  mat4.lookAt(viewMatrix, [mouseX, mouseY, 80], [0,0,0], [0,1,0])
+  mat4.lookAt(viewMatrix, [mouseX, mouseY, 65], [0,0,0], [0,1,0])
 
   clear()
 
-var num = 10
+var num = 30
 var start = -num /2
 
-for(var k = 0; k < num; k++) {
+for(var k = 0; k < 1; k++) {
   for (var j = 0; j <num; j++){
   for (var i = 0; i < num; i++){
     var obj = {
       objTime: currTime,
       view: viewMatrix,
-      translate: [start + j * (1.5 + Math.sin(currTime + j * 2)),
-        start + i * (1.5 + Math.sin(currTime + i * 2)),
-        start +k * (1.5 + Math.sin(currTime + k * 2))]
+      translate: [start + j,
+        start + i,
+        0
+      ]
     }
 if (trace){
   console.log(obj.translate[0], obj.translate[1])
