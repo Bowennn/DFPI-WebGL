@@ -1,5 +1,7 @@
 const regl = require('regl')()
-
+const strVertex = require('./Shaders/shaderVertex.js')
+const strFrag = require('./Shaders/shaderFrag.js')
+//console.log('strVertex', strVertex)
 const glm = require('gl-matrix')
 var mat4 = glm.mat4
 var projectionMatrix = mat4.create()
@@ -37,7 +39,7 @@ var currTime = 0
 
 
 var r = 0.5
-var points = [
+var aPosition = [
   [-r, r, 0],
   [r, r, 0],
   [r, -r,0],
@@ -68,7 +70,7 @@ var uvs = [
 
 
 var attributes = {
-  position: regl.buffer(points),
+  position: regl.buffer(aPosition),
   aColor: regl.buffer(colors),
   aUV: regl.buffer(uvs)
 }
@@ -80,70 +82,15 @@ var uniform = {
   uTranslate: regl.prop('translate')
 }
 
-var vertexShader = `
-precision mediump float;
-attribute vec3 position;
-attribute vec3 aColor;
-attribute vec2 aUV;
 
-uniform float uTime;
-uniform mat4 uProjectionMatrix;
-uniform mat4 uViewMatrix;
-uniform vec3 uTranslate;
-
-varying vec3 vColor;
-varying vec2 vUV;
-
-void main(){
-  //creat holder for position
-  vec3 pos = position + uTranslate;
-
-  float scale = 0.4;
-  float z = sin(uTranslate.x * scale + uTranslate.y * scale + uTime * 5.0);
-  pos.z += z * 1.5;
-
-
-  gl_Position= uProjectionMatrix * uViewMatrix * vec4(pos, 1.0);
-  vColor = aColor;
-  vUV = aUV;
-}
-`
-
-var fragShader = `
-precision mediump float;  //quality of rendering
-
-uniform vec3 uTranslate;
-varying vec3 vColor;
-varying vec2 vUV;
-
-void main(){
-  vec2 center = vec2(0.5, 0.5);
-  float d = distance(vUV, center);
-
-  vec4 colorBg = vec4(1.0, 1.0, 1.0, 0.0);
-  vec4 colorDot = vec4(1.0, 0.0, 0.0, 0.2);
-
-
-
-  float gradient = smoothstep(0.48, 0.5, d);
-  //gradient: 0 ~ 1
-
-  vec4 color = mix(colorDot, colorBg, gradient);
-  //gl_FragColor = vec4(color);
-
-  float alpha = 1.0 - gradient;
-  alpha *= 0.2;
-  gl_FragColor = vec4((uTranslate/5.0) * .5 + .5, alpha);
-}
-`
 
 console.log('Attribute:', attributes)
 
 const drawTriangle = regl (
   {
   attributes: attributes,
-  frag: fragShader,
-  vert: vertexShader,
+  frag: strFrag,
+  vert: strVertex,
   uniforms: uniform,
 
   depth:{
@@ -192,7 +139,7 @@ for(var k = 0; k < 1; k++) {
       objTime: currTime,
       view: viewMatrix,
       translate: [start + j,
-        start + i,
+                 start + i,
         0
       ]
     }
@@ -210,18 +157,3 @@ if (trace){
 }
 
 render()
-//console.log('start ksldkasdko')
-
-/*var ary = []
-ary.push(1)
-ary.push(2)
-ary.push(3)
-ary.push(4)
-ary.push(5) //push means add element
-console.log(ary)
-
-var popValue = ary.pop() //pop means clear the element
-// ary.shift()
-console.log('Pop value :', popValue)
-console.log('New arry:', )
-*/

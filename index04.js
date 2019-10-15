@@ -94,13 +94,6 @@ uniform vec3 uTranslate;
 varying vec3 vColor;
 varying vec2 vUV;
 
-vec2 rotate(vec2 v, float a) {
-	float s = sin(a);
-	float c = cos(a);
-	mat2 m = mat2(c, -s, s, c);
-	return m * v;
-}
-
 void main(){
   //creat holder for position
   vec3 pos = position + uTranslate;
@@ -108,11 +101,6 @@ void main(){
   float scale = 0.4;
   float z = sin(uTranslate.x * scale + uTranslate.y * scale + uTime * 5.0);
   pos.z += z * 1.5;
-
-  // float angle = cos(uTranslate.x + uTranslate.y + uTime);
-  // pos.xy = rotate(pos.xy, angle);
-
-  pos += uTranslate;
 
 
   gl_Position= uProjectionMatrix * uViewMatrix * vec4(pos, 1.0);
@@ -142,11 +130,6 @@ void main(){
 
   vec4 color = mix(colorDot, colorBg, gradient);
   //gl_FragColor = vec4(color);
-
-  //uTranslate = -5 ~ 5
-  //vec3 color = uTranslate / 5.0
-  //-1~1
-
 
   float alpha = 1.0 - gradient;
   alpha *= 0.2;
@@ -202,9 +185,9 @@ function render () {
 var num = 30
 var start = -num /2
 
-for(var k = 0; i < 1; k++) {
+for(var k = 0; k < 1; k++) {
   for (var j = 0; j <num; j++){
-  for (var i = 0; k < num; i++){
+  for (var i = 0; i < num; i++){
     var obj = {
       objTime: currTime,
       view: viewMatrix,
